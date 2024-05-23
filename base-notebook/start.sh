@@ -141,6 +141,8 @@ if [ "$(id -u)" == 0 ] ; then
         # shellcheck disable=SC2086
         if [ -z "$(ls -A /home/${NB_USER})" ]; then
             chown ${CHOWN_HOME_OPTS} "${NB_UID}:${NB_GID}" "/home/${NB_USER}"
+        else
+            _log "Skipping chown since user ${NB_USER}'s notebook server has been set up with mount storage before"
         fi
     fi
     if [ -n "${CHOWN_EXTRA}" ]; then
