@@ -136,8 +136,12 @@ if [ "$(id -u)" == 0 ] ; then
     # folder and/or additional folders
     if [[ "${CHOWN_HOME}" == "1" || "${CHOWN_HOME}" == "yes" ]]; then
         _log "Ensuring /home/${NB_USER} is owned by ${NB_UID}:${NB_GID} ${CHOWN_HOME_OPTS:+(chown options: ${CHOWN_HOME_OPTS})}"
+        # only chown if the user instantiates the notebook for the first time
+        # which means the directory must be empty since it was created through k8s mount
         # shellcheck disable=SC2086
-        chown ${CHOWN_HOME_OPTS} "${NB_UID}:${NB_GID}" "/home/${NB_USER}"
+        if [ -z "$(ls -A /home/${NB_USER})" ]; then
+            chown ${CHOWN_HOME_OPTS} "${NB_UID}:${NB_GID}" "/home/${NB_USER}"
+        fi
     fi
     if [ -n "${CHOWN_EXTRA}" ]; then
         for extra_dir in $(echo "${CHOWN_EXTRA}" | tr ',' ' '); do
